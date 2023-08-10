@@ -1,0 +1,70 @@
+
+
+<style>
+    .footermenu-top-container{
+        max-width:1440px;
+        
+        text-align: center;
+        margin: auto;
+    }
+    
+    .footer-menu-container{
+        display: flex; 
+        justify-content: space-around;
+        height: 400px;
+        gap:10px;
+        margin:auto;
+        padding: 0 120px 0 120px;
+    }
+
+    .fmc-child{
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        width:25%;
+        justify-content: center;
+        
+    }
+    .fmc-child h2{
+        padding-bottom:0px;
+        text-align: left;
+    }
+    .image-container{
+        display: flex;
+        align-items: center;
+    }
+</style>
+<div style="border-top: solid">
+    <div class="footermenu-top-container">
+        <div class = "footer-menu-container">
+            <div class="image-container">
+                <a href="/">
+                    <img src = "{{'footer-logo.png' | asset_url}}"/> 
+                </a>
+            </div>
+            <div class="fmc-child">
+                    <h2>Quick Links</h2>
+                    {% for link in linklists.pages-menu.links -%}
+                        <a href="{{ link.url }}" class="my-link">{{ link.title }}</a>
+                    {%- endfor %}      
+            </div>
+
+            <div class="fmc-child">
+                <h2>Categories</h2>
+                {% for link in linklists.header-menu.links -%}
+                    <a href="{{ link.url }}" class="my-link">{{ link.title }}</a>
+                {%- endfor %}   
+                
+            </div>
+
+            <div class="fmc-child">
+                <h2>Stay Up</h2>
+                <p>Sign up for all new product releases, product updates, sales, & collaborations</p>
+                <input placeholder = "Email"/> 
+            </div>
+
+        
+        </div>
+
+    </div>
+</div>

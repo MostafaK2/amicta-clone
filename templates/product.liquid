@@ -1,0 +1,194 @@
+<div class="middle-part-container" style="padding-top: 50px; padding-btttom: 50px">
+    <style>
+        .productContainer{
+            margin:auto;
+            padding:0 120px 0 120px;
+            display:flex;
+            gap:20px;
+        }
+
+        .product-picture-selector{
+            display:flex;
+            flex-direction:column;
+            width:10%;
+            gap:15px;
+            cursor: pointer;
+        }
+        .product-selected-image{
+            width: 45%;
+        }
+        .product-details{
+            width:45%;
+        }
+
+        #product-image{
+            width:100%; 
+        }
+    </style>
+    <div class = "productContainer">
+        <div class="product-picture-selector">
+            {% for image in product.images%}
+                <img id = "product-select-image" src ="{{image | image_url}}" />
+            {%endfor%}
+
+        </div>
+        <div class="product-selected-image">
+            <img id = "product-image" src = "{{product.featured_image | image_url}}" >
+        </div>
+        <div class = "product-details">
+            <div class='product-header'>
+                <h3>{{product.title}}</h3>
+                <p>{{product.vendor}} Collection</p>
+                <div style="display: flex; gap: 20px">
+                    <p class = "product-compare" style="text-decoration: line-through">{{product.selected_or_first_available_variant.compare_at_price | money}} USD</p>
+                    <p class = "product-price" style="text-decoration: none">{{product.selected_or_first_available_variant.price | money}} USD</p>
+                </div>
+                <div>
+                    <img alt="delivery-logo"/>
+                    <p>Est Delivery: Tuesday, August 15, 2023</p>
+                </div>
+            </div>
+            <div>     
+                {% form 'product', product%}
+                    <input id = "product-id" type="hidden" name = "id" value="{{product.selected_or_first_available_variant.id}}"/>
+                    <div class="product-option">
+                        {% for option in product.options_with_values %}
+                            <fieldset>
+                                <legend>{{option.name}}</legend>
+                                {% for value in option.values %}
+                                    <input 
+                                        {% if option.selected_value == {{value}} %} checked {%endif%}
+                                        type="radio"
+                                        name = {{option.name}}
+                                        value={{value}}
+                                        id = "{{option.name | handlize}}-{{value | handlize}}"
+                                    >
+                                        <label for="{{option.name | handlize}}-{{value | handlize}}">{{value}}</label>
+                                {% endfor %}
+                            </fieldset>
+                        {% endfor %}
+                    </div>
+
+                    
+                    <button type="submit" class="product-add">Add to cart</button>
+                    <button type="submit" id = "buy-it-now">Buy it Now </button>
+                {% endform%}
+                
+            </div>    
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/url-parse@1.5.10/dist/url-parse.min.js"></script>
+    <script>
+        var formatMoney = function(cents, format) {
+            if (typeof cents == 'string') { cents = cents.replace('.',''); }
+            var value = '';
+            var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+            var formatString = (format || this.money_format);
+          
+            function defaultOption(opt, def) {
+               return (typeof opt == 'undefined' ? def : opt);
+            }
+          
+            function formatWithDelimiters(number, precision, thousands, decimal) {
+              precision = defaultOption(precision, 2);
+              thousands = defaultOption(thousands, ',');
+              decimal   = defaultOption(decimal, '.');
+          
+              if (isNaN(number) || number == null) { return 0; }
+          
+              number = (number/100.0).toFixed(precision);
+          
+              var parts   = number.split('.'),
+                  dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands),
+                  cents   = parts[1] ? (decimal + parts[1]) : '';
+          
+              return dollars + cents;
+            }
+          
+            switch(formatString.match(placeholderRegex)[1]) {
+              case 'amount':
+                value = formatWithDelimiters(cents, 2);
+                break;
+              case 'amount_no_decimals':
+                value = formatWithDelimiters(cents, 0);
+                break;
+              case 'amount_with_comma_separator':
+                value = formatWithDelimiters(cents, 2, '.', ',');
+                break;
+              case 'amount_no_decimals_with_comma_separator':
+                value = formatWithDelimiters(cents, 0, '.', ',');
+                break;
+            }
+          
+            return formatString.replace(placeholderRegex, value);
+          };
+    </script>
+    <script>
+        var product = {{ product | json }}
+        
+        document.querySelectorAll('.product-option input[type="radio"]').forEach(
+            radio => radio.addEventListener('change', () => {
+                
+                var selected = []
+                document.querySelectorAll('.product-option input[type="radio"]:checked').forEach(radio => {
+                    selected.push(radio.value)
+                })
+                
+                var matched = product.variants.find(variant => {
+                    var pass = true
+                    
+                    for (var i = 0;  i < selected.length; i++){
+                        if (selected.indexOf(variant.options[i]) == -1){
+                            pass = false
+                            break
+                        }
+                    }
+                    return pass
+                   
+                })
+                console.log(matched)
+                document.querySelector('#product-id').value = matched.id;
+
+                // change url
+                var url = new URLParse(window.location.href, true)
+                url.query.variant = matched.id;
+
+                window.history.replaceState(null, null, url.toString())
+
+                // change prices based on variant
+                document.querySelector(".product-price").textContent = formatMoney(matched.price, "{{shop.money_format}}") + " USD";
+                document.querySelector(".product-compare").textContent = formatMoney(matched.compare_at_price, "{{shop.money_format}}") + " USD";
+
+                if (matched.compare_at_price > matched.price){
+                    document.querySelector(".product-compare").classList.remove('hide')
+                }
+                else {
+                    document.querySelector(".product-compare").classList.add('hide')
+                }
+
+            })
+        );
+
+        // switches images when a image has been clicked
+        document.querySelectorAll('#product-select-image').forEach(img => {
+            img.addEventListener('click', () => {
+                var selectedImageAttribute = img.getAttribute('src')
+                document.querySelector('#product-image').setAttribute('src', selectedImageAttribute);
+            })
+        });
+
+        document.querySelector('#buy-it-now').addEventListener('click', (e) => {
+            var form = document.querySelector('.shopify-product-form')
+            e.preventDefault();
+            var input = document.createElement('input')
+            input.value = '/checkout'
+            input.type = 'hidden'
+            input.name = 'return_to'
+
+            form.appendChild(input)
+            form.submit()            
+        })
+        
+        
+    </script>
+</div>

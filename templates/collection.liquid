@@ -1,0 +1,10 @@
+{% paginate collection.products by 2%}
+    <div>
+        <h1>{{collection.title}}</h1>
+        <p>Total Number of Products in this collection: {{collection.all_products_count}}</p>
+        {% for product in collection.products%}
+            {% render 'product-item', product: product%}
+        {%endfor%}
+    </div>
+    {{ paginate | default_pagination}}
+{% endpaginate%}

@@ -17,13 +17,151 @@
         .product-selected-image{
             width: 45%;
         }
-        .product-details{
-            width:45%;
-        }
-
+        
         #product-image{
             width:100%; 
         }
+
+        /* Css containing the product details */
+        .product-details{
+            width:45%;
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+        }
+        .product-header {
+            display:flex;
+            flex-direction: column;
+            border-bottom: 1px solid grey;
+            gap:20px;
+        }
+
+        .product-header h2, p{
+            font-family: 'Fost', sans-serif;
+            margin:0;
+        }
+
+        #est-delivery{
+            display:flex;
+            gap:10px;
+            align-items: center;
+            
+        }
+        #est-delivery img{
+            height:50px;
+            width:50px
+        }
+        #est-delivery p{
+            padding:0;
+        }
+
+        .product-compare{
+            color:#C6C6C6; 
+            text-decoration: Line-through;
+            font-size: 18px;
+        }
+
+        .product-price{
+            font-size: 18px;
+        }
+        {% comment %} #sale-circle{
+            font-size: 18px;
+            color:white;
+            background: #00308F;
+            padding-bottom:0;
+            padding: 5px;
+            border-radius: 50px;
+            align-items:center;
+            justify-content:center;
+        } {% endcomment %}
+
+        {% comment %} styling of product options {% endcomment %}
+        
+
+        .product-option fieldset{
+            display:flex;
+            flex-direction: column;
+            gap:10px;
+            border: none;
+            border-bottom: 1px solid grey;
+            padding: 20px 0 20px 0;
+        }
+
+       
+
+        .variant-options{
+            display: flex;
+            gap:15px;
+            height: 40px;
+        }
+
+        .variant-option div{
+            width: 50%;
+        }
+
+        .variant-opt{
+            width:20%;  
+            text-align: center;
+        }
+
+        
+        .variant-opt > input{ /* HIDE RADIO */
+            visibility: hidden; /* Makes input not-clickable */
+            position: absolute; /* Remove input from document flow */
+        }
+        .variant-opt > input + label{ /* DIV STYLES */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            height: 100%;
+            border-radius: 100px 100px;
+            border: 1px solid black;
+            margin: auto;
+            position: relative;   
+            
+        }
+        .variant-opt > input:checked + label{ /* (RADIO CHECKED) DIV STYLES */
+            background-color: black;
+            border: 1px solid black;
+            color: white;
+        }
+        
+        .buy-addcart{
+            display: flex; 
+            gap: 20px; 
+            justify-content:center; 
+            padding-top: 50px;
+        }
+        #product-add{
+            padding: 15px;
+            width: 50%;
+            border: 1px black solid;
+            border-radius: 5px;
+            font-size: 17px;
+            font-family: 'Jost', sans-serif;
+            cursor: pointer;
+            background: white;
+        }
+        #product-add:hover{
+            border: 2px black solid;
+        }
+        #buy-it-now:hover{
+            background: black;
+        }
+        #buy-it-now{
+            padding: 15px;
+            width: 50%;
+            border: 2px black solid;
+            border-radius: 5px;
+            font-size: 17px;
+            font-family: 'Jost', sans-serif;
+            cursor: pointer;
+
+            background: rgb(128, 62, 95);
+            color: white;
+        }
+
     </style>
     <div class = "productContainer">
         <div class="product-picture-selector">
@@ -37,14 +175,15 @@
         </div>
         <div class = "product-details">
             <div class='product-header'>
-                <h3>{{product.title}}</h3>
+                <h2>{{product.title}}</h2>
                 <p>{{product.vendor}} Collection</p>
                 <div style="display: flex; gap: 20px">
                     <p class = "product-compare" style="text-decoration: line-through">{{product.selected_or_first_available_variant.compare_at_price | money}} USD</p>
                     <p class = "product-price" style="text-decoration: none">{{product.selected_or_first_available_variant.price | money}} USD</p>
+                    <p id="sale-circle">Sale</p>
                 </div>
-                <div>
-                    <img alt="delivery-logo"/>
+                <div id="est-delivery">
+                    <img src="{{'truck.png' | asset_url}}" alt="delivery-logo"/>
                     <p>Est Delivery: Tuesday, August 15, 2023</p>
                 </div>
             </div>
@@ -53,29 +192,41 @@
                     <input id = "product-id" type="hidden" name = "id" value="{{product.selected_or_first_available_variant.id}}"/>
                     <div class="product-option">
                         {% for option in product.options_with_values %}
+                            
                             <fieldset>
-                                <legend>{{option.name}}</legend>
-                                {% for value in option.values %}
-                                    <input 
-                                        {% if option.selected_value == {{value}} %} checked {%endif%}
-                                        type="radio"
-                                        name = {{option.name}}
-                                        value={{value}}
-                                        id = "{{option.name | handlize}}-{{value | handlize}}"
-                                    >
-                                        <label for="{{option.name | handlize}}-{{value | handlize}}">{{value}}</label>
-                                {% endfor %}
+                                <p>{{option.name}}</p>
+                                <div class="variant-options">
+                                    {% for value in option.values %}
+                                        <div class="variant-opt">
+                                            <input 
+                                                {% if option.selected_value == {{value}} %} checked {%endif%}
+                                                type="radio"
+                                                name = {{option.name}}
+                                                value={{value}}
+                                                id = "{{option.name | handlize}}-{{value | handlize}}"
+                                            >
+                                            <label for="{{option.name | handlize}}-{{value | handlize}}">{{value}}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </fieldset>
                         {% endfor %}
                     </div>
 
-                    
-                    <button type="submit" class="product-add">Add to cart</button>
-                    <button type="submit" id = "buy-it-now">Buy it Now </button>
+                    <div class="buy-addcart">
+                        <button type="submit" id = "buy-it-now">Buy it Now </button>
+                        <button type="submit" id="product-add">Add to cart</button>
+                    </div>
                 {% endform%}
                 
-            </div>    
+            </div>
+            <div style="border-bottom: 1px solid black">129 people are viewing this item. Don’t wait!</div>
         </div>
+        
+    </div>
+    <div id="trending" class="middle-part-container">
+        <h2 class = "header" style="margin:auto; padding: 50px 0 50px 0">You may also like</h2>
+        {% render  'trending' %}
     </div>
     <script src="https://cdn.jsdelivr.net/npm/url-parse@1.5.10/dist/url-parse.min.js"></script>
     <script>

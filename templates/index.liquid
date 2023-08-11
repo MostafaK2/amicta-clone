@@ -4,50 +4,7 @@
 		<link href='https://fonts.googleapis.com/css2?family=Jost:display=swap' rel="stylesheet"/>
 		
 		<style>
-			{% comment %} start of Trending CSS {% endcomment %}
-			.trending{
-				max-width:1440px;
-				justify-content: center;
-				margin:auto;
-			}
-			.container-t{
-				display: flex; 
-				margin:auto;
-				height: 700px;
-				padding: 0 100px 0 100px;
-				gap:10px;
-			}
-			.header{
-				text-align: center;
-				margin-bottom: 100px;
-			}
-			.container-child-t{
-				height: fit-content;
-				width: 25%;
-				cursor:pointer;
-				text-align: center;
-				justify-content: center;
-				gap:0;
-			}
-			.container-child-t img{
-				height:450px;
-				width:100%;
-			}
-
-			.container-child-t p{
-				font-size: 14px;
-				margin-top: 1rem;
-				margin-bottom: 0px;
-				weight: bold;
-				text-decoration:none;
-
-			}
-			.underline{
-				text-decoration:none;
-			}
-			.underline:hover{
-				text-decoration: underline;
-			}
+			
 			.everything{
 				margin: auto; 
 				display:flex; 
@@ -75,9 +32,7 @@
 				margin:auto;
 				padding: 0px 120px 0 120px;
 			}
-			.middle-part-child.eid-season{
-				height:fit-content;
-			}
+			
 
 			.ven{
 				height:100%;
@@ -385,27 +340,10 @@
 					</div>
 				</div>
 			</div>
-			<div class="trending">
+			<div id="trending" class="middle-part-container">
 				<h2 class = "header">Trending Now</h2>
 				{% comment %} add  a filter to this for loop to only select 4 elements {% endcomment %}
-				<div class="container-t">
-					{% for product in collections['Trending'].products %}
-						<a href = "{{product.url}}">
-							<div class = "container-child-t">
-								<img src = "{{product.featured_image | image_url}}"/>
-								<p>{{- product.title | link_to: product.url }}</p> 
-								<p style="color:#BD6792;">Some Collections</p>
-								<div style="display: flex; gap: 15px; justify-content: center;">
-									<p style="color:#C6C6C6; text-decoration: Line-through">{{product.compare_at_price | money}} USD</p>
-									<p>{{product.price | money}} USD</p>
-								</div>
-							</div>
-						</a>
-							
-					{% endfor %}
-				</div>
-				
-
+				{% render  'trending' %}
 			</div>
 			<div id = "shop-vendor" class="middle-part-container" >
 				<h2>Shop By Vendor</h2>

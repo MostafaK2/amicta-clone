@@ -1,0 +1,73 @@
+<style>
+    
+    .container-t{
+        display: flex; 
+		justify-content: center;
+        padding: 0px 120px 0 120px;
+        gap:10px;
+		margin:auto;
+    }
+    .container-t > div{
+        width:25%;
+    }
+
+    .container-child-t{
+        height: fit-content;
+        width: 100%;
+        cursor:pointer;
+        text-align: center;
+        justify-content: center;
+        gap:0;
+        
+    }
+    .container-child-t img{
+        height: 480px;
+        width:100%;
+        object-fit: cover;   
+    }
+
+    @media screen and (max-width:900px){
+        .container-t{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .container-t > div{
+            width: 100%;
+        }
+    }
+
+    @media screen and (max-width:650px){
+        .container-t{
+            padding:0 25px 0 25px;
+            grid-template-columns: 1fr 1fr;
+            
+        }
+        .container-t > div{
+            width: 100%;
+        }
+
+        .container-child-t img{
+            height: 400px;
+        }
+    }
+
+    
+    
+</style>
+<div class="container-t">
+    {% for product in collections['Trending'].products %}
+        <div>
+            <a class="something" href = "{{product.url}}">
+                <div class="container-child-t">
+                    <img src = "{{product.featured_image | image_url}}"/>
+                    <p style="text-decoration:none">{{- product.title | link_to: product.url }}</p> 
+                    <p style="color:#BD6792;">Some Collections</p>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <p style="color:#C6C6C6; text-decoration: Line-through">{{product.compare_at_price | money}} USD</p>
+                        <p>{{product.price | money}} USD</p>
+                    </div>	
+                </div>
+            </a>
+        </div>		
+    {% endfor %}
+</div>
